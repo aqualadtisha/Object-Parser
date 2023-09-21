@@ -17,27 +17,21 @@ class ObjParser {
   void operator=(const ObjParser& other) = delete;
   ~ObjParser() = default;
 
-  int ParsingFile() {
+  void ParsingFile();
+  void Grouping();
 
-  }
-
-  int Validate(std::string str) {
-    valid_ = Validator();
-  }
-
-  int Parse(std::string str) {
-    parse_ = Parser();
-  }
-
-  int Operations() {
-    opers_ = Operations();
-  }
+  std::list<Node> GetList();
 
  private:
   std::list<Node> list_;
   Validator valid_;
   Parser parse_;
-  Operations opers_;
+
+  bool status_ = true;
+  int mode = 0;
+
+  void Validate();
+  void Parse();
 };
 
 }

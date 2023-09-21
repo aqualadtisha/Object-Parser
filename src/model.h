@@ -8,7 +8,10 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace objP {
 
@@ -20,58 +23,54 @@ const static std::map<std::string, int> type_assert = {
 class Node {
  public:
   Node() = default;
-  Node(int i){
-
+  Node(std::string name,
+       double x, double y, int type, long double time){
+  name_ = std::move(name);
+  x_ = x;
+  y_ = y;
+  type_ = type;
+  time_ = time;
   };
 
-  std::string name;
-  double x = 0;
-  double y = 0;
-  int type = kNoType;
-  long double time = 0;
+  void Grouping() {};
+
+  std::string name_;
+  double x_ = 0;
+  double y_ = 0;
+  int type_ = kNoType;
+  long double time_ = 0;
 };
 
 class Validator {
  public:
   Validator() = default;
-  Validator(std::string str) {
 
-  }
-
-  void ValidatePath() {
-    std::cout << "Hello! This program will parse your file." << std::endl;
-    std::cout << "Please, enter your FULL file path: " << std::endl;
-    std::cin >> path_;
-
-    std::ifstream file(
-        "/Users/aqualadt/Desktop/Git/Object-Parser/src/Objects.txt");
-
-    while (!file.is_open()) {
-      std::cout << "Invalid path or files mode parameters." << std::endl;
-      std::cout << "Please, enter your FULL file path: " << std::endl;
-      std::cin >> path_;
-      file.open("/Users/aqualadt/Desktop/Git/Object-Parser/src/Objects.txt");
-    }
-  }
+  bool ValidateFile();
+  static bool ValidateTokens(const std::vector<std::string> &tokens);
+  std::string GetPath();
 
  private:
   std::string path_;
+  bool status_ = true;
+  std::ifstream file_;
+  std::string str_;
+
+  bool ValidatePath(const std::string &path);
 };
 
 class Parser {
  public:
   Parser() = default;
-  Parser(std::string str) {
-
+  Parser(const std::string& path, std::list<Node> &l) : list_(&l) {
+    file_.open(path);
   }
+
+  bool InitParsing();
 
  private:
   std::list<Node> *list_ = nullptr;
-
-};
-
-class Operations {
-  void RangeSort() {};
+  std::ifstream file_;
+  std::string str_;
 };
 
 }
