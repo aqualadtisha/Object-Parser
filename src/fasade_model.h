@@ -17,8 +17,8 @@ class ObjParser {
   void operator=(const ObjParser& other) = delete;
   ~ObjParser() = default;
 
-  void ParsingFile();
-  void Grouping();
+  int ParsingFile(std::string &str);
+  void Grouping(int mode);
 
   std::list<Node> GetList();
 
@@ -26,11 +26,11 @@ class ObjParser {
   std::list<Node> list_;
   Validator valid_;
   Parser parse_;
+  Groping group_;
 
-  bool status_ = true;
-  int mode = 0;
+  int status_ = 0;
 
-  void Validate();
+  void Validate(std::string str);
   void Parse();
 };
 

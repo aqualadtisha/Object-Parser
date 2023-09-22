@@ -16,6 +16,7 @@
 namespace objP {
 
 enum Types { kNoType = 0, kHuman, kCar, kHouse, kTree, kAnother };
+enum Errors { kOk = 0, kValidPath, kValidFile, kPars, kGroup, kQuit };
 
 const static std::map<std::string, int> type_assert = {
     {"Человек", kHuman},  {"Машина", kCar}, {"Здание", kHouse}, {"Дерево", kTree}};
@@ -24,7 +25,7 @@ class Node {
  public:
   Node() = default;
   Node(std::string name,
-       double x, double y, int type, long double time){
+       double x, double y, std::string type, long double time) {
   name_ = std::move(name);
   x_ = x;
   y_ = y;
@@ -32,12 +33,12 @@ class Node {
   time_ = time;
   };
 
-  void Grouping() {};
+  void NodeToString(std::string &str);
 
   std::string name_;
   double x_ = 0;
   double y_ = 0;
-  int type_ = kNoType;
+  std::string type_;
   long double time_ = 0;
 };
 
@@ -45,17 +46,18 @@ class Validator {
  public:
   Validator() = default;
 
-  bool ValidateFile();
-  static bool ValidateTokens(const std::vector<std::string> &tokens);
+  int ValidateFile();
+  static int ValidateTokens(const std::vector<std::string> &tokens);
   std::string GetPath();
+  void SetPath(std::string &p);
 
  private:
   std::string path_;
-  bool status_ = true;
+  int status_ = kOk;
   std::ifstream file_;
   std::string str_;
 
-  bool ValidatePath(const std::string &path);
+  int ValidatePath();
 };
 
 class Parser {
@@ -71,6 +73,26 @@ class Parser {
   std::list<Node> *list_ = nullptr;
   std::ifstream file_;
   std::string str_;
+};
+
+class Grouping{
+ public:
+  Grouping() = default;
+  explicit Grouping(std::list<Node> &l) : list_(l){};
+
+  int SwitchMode(int mode);
+  void GroupByDistance();
+  void GroupByName();
+  void GroupByTime();
+  void GroupByType();
+
+ private:
+  std::list<Node> list_;
+
+  static int CompareNames(const void *a, const void *b);
+  static int CompareCoords(const void *a, const void *b);
+  static int CompareTime(const void *a, const void *b);
+  static int CompareType(const void *a, const void *b);
 };
 
 }

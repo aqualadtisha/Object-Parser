@@ -5,23 +5,24 @@
 #include "fasade_model.h"
 
 namespace objP {
+
 class Controller {
  public:
   Controller() = default;
   explicit Controller(ObjParser &m) : model_(&m){};
 
-  bool InitParse() {
-    model_->ParsingFile();
-    return 0;
+  int InitParse(std::string &str) {
+    return model_->ParsingFile(str);
   }
 
-  bool MakeGroup(int mode) {
-    model_->Grouping();
+  int MakeGroup(int mode) {
+    model_->Grouping(mode);
     return 0;
   }
 
 
  private:
-  ObjParser *model_;
+  ObjParser *model_ = nullptr;
 };
+
 }
