@@ -1,8 +1,4 @@
-//
-// Created by Aqualad Tisha on 9/21/23.
-//
-
-#include "fasade_model.h"
+#include "model/fasade_model.h"
 
 namespace objP {
 
@@ -11,18 +7,15 @@ class Controller {
   Controller() = default;
   explicit Controller(ObjParser &m) : model_(&m){};
 
-  int InitParse(std::string &str) {
-    return model_->ParsingFile(str);
-  }
+  int InitParse(std::string &str) { return model_->ParsingFile(str); }
 
-  int MakeGroup(int mode) {
-    model_->Grouping(mode);
+  int MakeGroup(int mode, int n) {
+    model_->Group(mode, n);
     return 0;
   }
-
 
  private:
   ObjParser *model_ = nullptr;
 };
 
-}
+}  // namespace objP

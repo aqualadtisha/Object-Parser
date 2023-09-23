@@ -1,15 +1,11 @@
-//
-// Created by Aqualad Tisha on 9/22/23.
-//
-
 #ifndef OBJECT_PARSER_FRONT_H
 #define OBJECT_PARSER_FRONT_H
 
 #include "controller.h"
 
-namespace objP{
+namespace objP {
 
-template <class Controller = objP::Controller >
+template <class Controller = objP::Controller>
 class Front {
  public:
   Front() = default;
@@ -36,12 +32,18 @@ void Front<Controller>::Start() {
     std::cout << "Grouping by time:     -- 3" << std::endl;
     std::cout << "Grouping by type:     -- 4" << std::endl;
 
-    int mode = 0;
+    int mode = 0, n = 0;
     std::cin >> mode;
 
-    controll_->MakeGroup(mode);
+    if (mode == 4) {
+      std::cout << "Please, enter the min group size:" << std::endl;
+      std::cin >> n;
+    }
 
-    std::cout << "Check results in file \"Results.txt\" in Project folder." << std::endl;
+    controll_->MakeGroup(mode, n);
+
+    std::cout << "Check results in file \"Results.txt\" in Project folder."
+              << std::endl;
   }
   std::cout << "Bye!" << std::endl;
 }
@@ -50,9 +52,10 @@ template <class Controller>
 void Front<Controller>::SetPath() {
   std::string path;
   bool error = true;
-  std::cout << "Please, enter your FULL file path or \"Q\" to quit: " << std::endl;
+  std::cout << "Please, enter your FULL file path or \"Q\" to quit: "
+            << std::endl;
 
-  while(error && !quit_) {
+  while (error && !quit_) {
     std::cin >> path;
     int res = controll_->InitParse(path);
 
@@ -71,6 +74,6 @@ void Front<Controller>::SetPath() {
   }
 }
 
-}
+}  // namespace objP
 
 #endif  // OBJECT_PARSER_FRONT_H

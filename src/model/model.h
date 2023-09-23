@@ -1,7 +1,3 @@
-//
-// Created by Aqualad Tisha on 9/21/23.
-//
-
 #ifndef OBJECT_PARSER_MODEL_H
 
 #include <fstream>
@@ -12,6 +8,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iterator>
 
 namespace objP {
 
@@ -25,21 +22,21 @@ class Node {
  public:
   Node() = default;
   Node(std::string name,
-       double x, double y, std::string type, long double time) {
+       double x, double y, std::string type, long long time) {
   name_ = std::move(name);
   x_ = x;
   y_ = y;
-  type_ = type;
+  type_ = std::move(type);
   time_ = time;
   };
 
-  void NodeToString(std::string &str);
+  void NodeToString(std::string &str) const;
 
   std::string name_;
   double x_ = 0;
   double y_ = 0;
   std::string type_;
-  long double time_ = 0;
+  long long time_ = 0;
 };
 
 class Validator {
@@ -78,21 +75,31 @@ class Parser {
 class Grouping{
  public:
   Grouping() = default;
-  explicit Grouping(std::list<Node> &l) : list_(l){};
+  explicit Grouping(std::list<Node> &l) : list_(&l){};
 
-  int SwitchMode(int mode);
+  int SwitchMode(int mode, int n);
+
+ private:
+  std::list<Node> *list_ = nullptr;
+
   void GroupByDistance();
   void GroupByName();
   void GroupByTime();
-  void GroupByType();
+  void GroupByType(int n);
 
- private:
-  std::list<Node> list_;
+  static int CompareNames(const Node &a, const Node &b);
+  static int CompareCoords(const Node &a, const Node &b);
+  static int CompareTime(const Node &a, const Node &b);
+  static int CompareType(const Node &a, const Node &b);
 
-  static int CompareNames(const void *a, const void *b);
-  static int CompareCoords(const void *a, const void *b);
-  static int CompareTime(const void *a, const void *b);
-  static int CompareType(const void *a, const void *b);
+  static bool CheckRusLetter(char c);
+  static int CheckTimeInterval(std::vector<std::string> &now, std::vector<std::string> &node);
+  static int CheckDistanse(double dist);
+
+  void GroupByTypeWrite(std::vector<std::string> types);
+  void GroupByTimeWrite();
+  void GroupByDistWrite();
+  void GroupByNameWrite();
 };
 
 }

@@ -1,7 +1,3 @@
-//
-// Created by Aqualad Tisha on 9/21/23.
-//
-
 #ifndef OBJECT_PARSER_FASADE_MODEL_H
 #define OBJECT_PARSER_FASADE_MODEL_H
 
@@ -18,15 +14,13 @@ class ObjParser {
   ~ObjParser() = default;
 
   int ParsingFile(std::string &str);
-  void Grouping(int mode);
-
-  std::list<Node> GetList();
+  void Group(int mode, int n);
 
  private:
   std::list<Node> list_;
   Validator valid_;
   Parser parse_;
-  Groping group_;
+  Grouping group_;
 
   int status_ = 0;
 
