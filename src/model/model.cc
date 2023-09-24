@@ -158,7 +158,7 @@ int Grouping::CompareType(const Node &a, const Node &b) {
   return (a.type_ < b.type_);
 }
 void Grouping::GroupByTypeWrite(std::vector<std::string> &types) {
-  file.open("../Results.txt");
+  file.open("Results.txt");
 
   WriteTypesFromList(types);
 
@@ -200,7 +200,7 @@ void Grouping::WriteTypesFromList(std::vector<std::string> &types) {
 }
 
 void Grouping::GroupByTimeWrite() {
-  file.open("../Results.txt");
+  file.open("Results.txt");
 
   time_t result = time(nullptr);
   std::string now, time;
@@ -260,7 +260,7 @@ int Grouping::CheckTimeInterval(std::vector<std::string> &now,
 }
 
 void Grouping::GroupByDistWrite() {
-  file.open("../Results.txt");
+  file.open("Results.txt");
 
   std::vector<std::string> distanses{
       "Group До 100 единиц:\n", "Group До 1000 единиц:\n",
@@ -296,7 +296,7 @@ int Grouping::CheckDistanse(double dist) {
   return count;
 }
 void Grouping::GroupByNameWrite() {
-  QFile qfile("../Results.txt");
+  QFile qfile("Results.txt");
   qfile.open(QIODevice::WriteOnly);
   QTextStream out(&qfile);
 
