@@ -92,7 +92,7 @@ class Grouping{
   static int CompareTime(const Node &a, const Node &b);
   static int CompareType(const Node &a, const Node &b);
 
-  static bool CheckRusLetter(char c);
+  static bool CheckRusLetter(int c);
   static int CheckTimeInterval(std::vector<std::string> &now, std::vector<std::string> &node);
   static int CheckDistanse(double dist);
 

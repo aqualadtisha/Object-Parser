@@ -1,7 +1,9 @@
 #include "model.h"
 
+#include <QFile>
+#include <QString>
+#include <QTextStream>
 #include <valarray>
-
 namespace objP {
 
 static double FindDistanse(const Node &a) {
@@ -102,7 +104,7 @@ void Grouping::GroupByName() {
   GroupByNameWrite();
 }
 
-bool Grouping::CheckRusLetter(char c) { return c <= -48 && c >= -78; }
+bool Grouping::CheckRusLetter(int c) { return c <= -48 && c >= -81; }
 
 void Grouping::GroupByTime() {
   list_->sort(CompareTime);
@@ -283,23 +285,26 @@ int Grouping::CheckDistanse(double dist) {
   return count;
 }
 void Grouping::GroupByNameWrite() {
-  std::ofstream file;
-  file.open("../Results.txt");
-  std::string letter{};  // add check for non russian words -48 (А) - -75 (Я)
-  if (!CheckRusLetter(list_->front().name_[0])) {
+  QFile file("../Results.txt");
+  file.open(QIODevice::WriteOnly);
+  QTextStream out(&file);
+
+  QString letter = QString::fromStdString(list_->front().name_);;  // add check for non russian words -48 (А) - -75 (Я)
+  QString name{};
+
+  if (!CheckRusLetter(QString(letter).at(0).toLatin1())) {
     letter = '#';
-  } else {
-    letter = list_->front().name_[0];
   }
 
-  file << "Group " << letter.c_str() << ":" << std::endl;
+  out << "Group " << letter[0] << ":\n\n";
 
   for (const Node &node : *list_) {
-    if (node.name_[0] != letter[0] && CheckRusLetter(node.name_[0])) {
-      letter = node.name_;
-      file << "Group " << node.name_[0] << ":" << std::endl;
+    name = QString::fromStdString(node.name_);
+    if (name[0] != letter[0] && CheckRusLetter(name.toStdString().at(0))) { // .toStdString().at(0)
+      letter = name;
+      out << "\nGroup " << name[0] << ":\n\n";
     }
-    file << node.name_.c_str() << std::endl;
+    out << name << '\n';
   }
   file.close();
 }
