@@ -30,7 +30,7 @@ class Node {
   time_ = time;
   };
 
-  void NodeToString(std::string &str) const;
+  std::string NodeToString() const;
 
   std::string name_;
   double x_ = 0;
@@ -81,6 +81,7 @@ class Grouping{
 
  private:
   std::list<Node> *list_ = nullptr;
+  std::ofstream file;
 
   void GroupByDistance();
   void GroupByName();
@@ -96,10 +97,13 @@ class Grouping{
   static int CheckTimeInterval(std::vector<std::string> &now, std::vector<std::string> &node);
   static int CheckDistanse(double dist);
 
-  void GroupByTypeWrite(std::vector<std::string> types);
+  void GroupByTypeWrite(std::vector<std::string> &types);
   void GroupByTimeWrite();
   void GroupByDistWrite();
   void GroupByNameWrite();
+
+  void WriteTypesFromList(std::vector<std::string> &types);
+  void WriteTypesToVector(std::vector<std::string> &types, int n);
 };
 
 }

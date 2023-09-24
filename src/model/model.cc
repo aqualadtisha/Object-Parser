@@ -10,9 +10,9 @@ static double FindDistanse(const Node &a) {
   return std::sqrt(std::pow(a.x_, 2) + std::pow(a.y_, 2));
 }
 
-void Node::NodeToString(std::string &str) const {
-  str = std::to_string(x_) + std::to_string(y_) + type_ +
-        std::to_string(time_);  // name_  +
+std::string Node::NodeToString() const {
+  return name_ + " " + std::to_string(x_) + " " + std::to_string(y_) + " " +
+         type_ + " " + std::to_string(time_);
 }
 
 int Validator::ValidatePath() {
@@ -29,12 +29,13 @@ int Validator::ValidatePath() {
 int Validator::ValidateFile() {  //// validating right count of obj parameters
   status_ = ValidatePath();
   if (status_ == kOk) {
-    while (!file_.eof() && status_) {
+    while (!file_.eof() && !status_) {
       getline(file_, str_);
       std::istringstream iss(str_);
       std::vector<std::string> tokens((std::istream_iterator<std::string>(iss)),
                                       std::istream_iterator<std::string>());
-      status_ = (tokens.size() == 5);
+      if (tokens.empty()) continue;
+      status_ = (tokens.size() == 5) ? kOk : kValidFile;
       if (status_ == kOk) {
         status_ = ValidateTokens(tokens);
       }
@@ -116,6 +117,13 @@ void Grouping::GroupByType(int n) {
   list_->sort(CompareType);
 
   std::vector<std::string> types{};
+
+  WriteTypesToVector(types, n);
+
+  GroupByTypeWrite(types);
+}
+
+void Grouping::WriteTypesToVector(std::vector<std::string> &types, int n) {
   int count = 0;
   std::string tmp = list_->front().type_;
 
@@ -130,11 +138,10 @@ void Grouping::GroupByType(int n) {
       tmp = node.type_;
     }
   }
+
   if (count >= n) {
     types.push_back(tmp);
   }
-
-  GroupByTypeWrite(types);
 }
 
 int Grouping::CompareNames(const Node &a, const Node &b) {
@@ -150,18 +157,32 @@ int Grouping::CompareTime(const Node &a, const Node &b) {
 int Grouping::CompareType(const Node &a, const Node &b) {
   return (a.type_ < b.type_);
 }
-void Grouping::GroupByTypeWrite(std::vector<std::string> types) {
-  std::ofstream file;
+void Grouping::GroupByTypeWrite(std::vector<std::string> &types) {
   file.open("../Results.txt");
 
+  WriteTypesFromList(types);
+
+  if (!list_->empty()) {
+    file << "\nGroup "
+         << "Разное:\n"
+         << std::endl;
+    for (const Node &node : *list_) {
+      file << node.NodeToString() << std::endl;
+    }
+  }
+  file.close();
+}
+
+void Grouping::WriteTypesFromList(std::vector<std::string> &types) {
   size_t count = 0;
   bool flag = false;
-  file << "\nGroup " << types[count] << ":\n" << std::endl;
+
+  file << "\nGroup " << types[0] << ":\n" << std::endl;
 
   auto iter = list_->begin();
   while (iter != list_->end()) {
     if (iter->type_ == types[count]) {
-      file << iter->type_ << std::endl;
+      file << iter->NodeToString() << std::endl;
       --iter;
       list_->erase(++iter);
       iter++;
@@ -176,19 +197,9 @@ void Grouping::GroupByTypeWrite(std::vector<std::string> types) {
       iter++;
     }
   }
-
-  if (!list_->empty()) {
-    file << "\nGroup "
-         << "Разное:\n"
-         << std::endl;
-    for (const Node &node : *list_) {
-      file << node.type_ << std::endl;
-    }
-  }
-  file.close();
 }
+
 void Grouping::GroupByTimeWrite() {
-  std::ofstream file;
   file.open("../Results.txt");
 
   time_t result = time(nullptr);
@@ -199,9 +210,9 @@ void Grouping::GroupByTimeWrite() {
   std::vector<std::string> t_now((std::istream_iterator<std::string>(iss)),
                                  std::istream_iterator<std::string>());
 
-  std::vector<std::string> interval{"Сегодня",          "Вчера",
-                                    "В течение недели", "В этом месяце",
-                                    "В этом году",      "Ранее"};
+  std::vector<std::string> interval{"Сегодня:\n",          "Вчера:\n",
+                                    "В течение недели:\n", "В этом месяце:\n",
+                                    "В этом году:\n",      "Ранее:\n"};
 
   int state = -1, count = -1;
 
@@ -216,10 +227,10 @@ void Grouping::GroupByTimeWrite() {
 
     if (state != count) {
       state = count;
-      file << "\nGroup " << interval[state] << ":\n" << std::endl;
+      file << "\nGroup " << interval[state] << std::endl;
     }
 
-    file << std::fixed << node.time_ << " " << time;
+    file << node.NodeToString() << std::endl;
   }
   file.close();
 }
@@ -227,7 +238,7 @@ void Grouping::GroupByTimeWrite() {
 int Grouping::CheckTimeInterval(std::vector<std::string> &now,
                                 std::vector<std::string> &node) {
   int count = 0;
-  if (node[4] == now[4]) {  // Thu Aug 03 17:59:37 2023
+  if (node[4] == now[4]) {
     if (node[1] == now[1]) {
       if (node[2] == now[2]) {
         count = 0;
@@ -247,13 +258,13 @@ int Grouping::CheckTimeInterval(std::vector<std::string> &now,
   }
   return count;
 }
+
 void Grouping::GroupByDistWrite() {
-  std::ofstream file;
   file.open("../Results.txt");
 
   std::vector<std::string> distanses{
-      "Group До 100 единиц:", "Group До 1000 единиц:", "Group До 10000 единиц:",
-      "Слишком далеко"};
+      "Group До 100 единиц:\n", "Group До 1000 единиц:\n",
+      "Group До 10000 единиц:\n", "Слишком далеко"};
 
   double dist = FindDistanse(list_->front());
 
@@ -264,9 +275,9 @@ void Grouping::GroupByDistWrite() {
     dist = FindDistanse(node);
     if (dist > 100 * std::pow(10, count) && count != 3) {
       count++;
-      file << distanses[count] << std::endl;
+      file << '\n' << distanses[count] << std::endl;
     }
-    file << dist << std::endl;
+    file << node.NodeToString() << std::endl;
   }
   file.close();
 }
@@ -285,28 +296,28 @@ int Grouping::CheckDistanse(double dist) {
   return count;
 }
 void Grouping::GroupByNameWrite() {
-  QFile file("../Results.txt");
-  file.open(QIODevice::WriteOnly);
-  QTextStream out(&file);
+  QFile qfile("../Results.txt");
+  qfile.open(QIODevice::WriteOnly);
+  QTextStream out(&qfile);
 
-  QString letter = QString::fromStdString(list_->front().name_);;  // add check for non russian words -48 (А) - -75 (Я)
+  QString letter = QString::fromStdString(list_->front().name_);
   QString name{};
 
-  if (!CheckRusLetter(QString(letter).at(0).toLatin1())) {
+  if (!CheckRusLetter(list_->front().name_[0])) {
     letter = '#';
   }
-
   out << "Group " << letter[0] << ":\n\n";
 
   for (const Node &node : *list_) {
     name = QString::fromStdString(node.name_);
-    if (name[0] != letter[0] && CheckRusLetter(name.toStdString().at(0))) { // .toStdString().at(0)
+
+    if (name[0] != letter[0] && CheckRusLetter(name.toStdString().at(0))) {
       letter = name;
-      out << "\nGroup " << name[0] << ":\n\n";
+      out << "\nGroup " << letter[0] << ":\n\n";
     }
-    out << name << '\n';
+    out << QString::fromStdString(node.NodeToString()) << '\n';
   }
-  file.close();
+  qfile.close();
 }
 
 }  // namespace objP

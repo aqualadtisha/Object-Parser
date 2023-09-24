@@ -1,5 +1,5 @@
-#ifndef OBJECT_PARSER_FASADE_MODEL_H
-#define OBJECT_PARSER_FASADE_MODEL_H
+#ifndef OBJECT_PARSER_FACADE_MODEL_H
+#define OBJECT_PARSER_FACADE_MODEL_H
 
 #include "model.h"
 
@@ -24,11 +24,11 @@ class ObjParser {
 
   int status_ = 0;
 
-  void Validate(std::string str);
+  void Validate(std::string &str);
   void Parse();
 };
 
 }
 
 
-#endif //OBJECT_PARSER_FASADE_MODEL_H
+#endif  // OBJECT_PARSER_FACADE_MODEL_H
